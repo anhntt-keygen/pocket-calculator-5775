@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pocket Calculator - Máy Tính Cầm Tay Thông Minh</title>
+  <!-- Google Fonts & TailwindCSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind Config Customizations -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          boxShadow: {
+            'neumorph-light': '5px 5px 10px #d1d5db, -5px -5px 10px #ffffff',
+            'neumorph-dark': '5px 5px 10px #0b0f19, -5px -5px 10px #1b263b',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom CSS to smooth transition and control scrollbar */
+    body {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Active feedback on clicks */
+    .btn-active:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 transition-all duration-300">
+
+  <!-- Main Container -->
+  <div class="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 flex flex-col relative">
+    
+    <!-- Top Bar with Mode Toggle & History Toggle -->
+    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+      <span class="text-sm font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500 font-mono">Pocket Calc v2.0</span>
+      <div class="flex items-center space-x-4">
+        <!-- History Toggle Button -->
+        <button id="btn-toggle-history" class="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Lịch sử (H)">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-600 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+        <!-- Dark/Light Theme Toggle -->
+        <button id="btn-theme-toggle" class="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Đổi giao diện">
+          <svg id="theme-sun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <svg id="theme-moon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Screen Display Area -->
+    <div class="px-6 py-6 bg-slate-50 dark:bg-slate-800/30 flex flex-col justify-end items-end text-right min-h-[140px] border-b border-slate-100 dark:border-slate-700 relative">
+      <!-- Secondary Expression Display -->
+      <div id="display-expr" class="text-sm md:text-base text-slate-400 dark:text-slate-500 font-mono tracking-wide break-all select-none min-h-[24px]"></div>
+      <!-- Primary Current Value Display -->
+      <div id="display-current" class="text-4xl md:text-5xl font-bold font-mono tracking-tight text-slate-800 dark:text-slate-100 break-all select-all select-none overflow-x-auto scrollbar-none w-full max-w-full">
+        0
+      </div>
+    </div>
+
+    <!-- Calculator Keyboard & Keypad Grid -->
+    <div class="p-6 bg-white dark:bg-slate-800 grid grid-cols-4 gap-3">
+      <!-- Row 1: AC, Back, %, Division -->
+      <button data-key="clear" class="btn-active bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 font-bold text-lg p-4 rounded-2xl hover:brightness-95 transition">AC</button>
+      <button data-key="backspace" class="btn-active bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 font-bold text-lg p-4 rounded-2xl hover:brightness-95 transition" title="Xóa ký tự cuối (Backspace)">DEL</button>
+      <button data-key="percent" class="btn-active bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-lg p-4 rounded-2xl hover:brightness-95 transition">%</button>
+      <button data-key="operator" data-val="/" class="btn-active bg-indigo-500 text-white font-bold text-xl p-4 rounded-2xl hover:bg-indigo-600 transition" title="Chia (/)">÷</button>
+
+      <!-- Row 2: 7, 8, 9, Multiplication -->
+      <button data-key="num" data-val="7" class="btn-active bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 font-semibold text-xl p-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition">7</button>
+      <button data-key="num" data-val="8" class="btn-active bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 font-semibold text-xl p-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition">8</button>
+      <button data-key="num" data-val="9" class="btn-active bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 font-semibold text-xl p-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition">9</button>
+      <button data-key="operator" data-val="*" class="btn-active bg-indigo-500 text-white font-bold text-xl p-4 rounded-2xl hover:bg-indigo-600 transition" title="Nhân (*)">×</button>
+
+      <!-- Row 3: 4, 5, 6, Subtraction -->
+      <button data-key="num" data-val="4" class="btn-active bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 font-semibold text-xl p-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition">4</button>
+      <button data-key="num" data-val="5" class="btn-active bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 font-semibold text-xl p-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition">5</button>
+      <button data-key="num" data-val="6" class="btn-active bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 font-semibold text-xl p-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition">6</button>
+      <button data-key="operator" data-val="-" class="btn-active bg-indigo-500 text-white font-bold text-xl p-4 rounded-2xl hover:bg-indigo-600 transition" title="Trừ (-)">-</button>
+
+      <!-- Row 4: 1, 2, 3, Addition -->
+      <button data-key="num" data-val="1" class="btn-active bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 font-semibold text-xl p-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition">1</button>
+      <button data-key="num" data-val="2" class="btn-active bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 font-semibold text-xl p-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition">2</button>
+      <button data-key="num" data-val="3" class="btn-active bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 font-semibold text-xl p-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition">3</button>
+      <button data-key="operator" data-val="+" class="btn-active bg-indigo-500 text-white font-bold text-xl p-4 rounded-2xl hover:bg-indigo-600 transition" title="Cộng (+)">+</button>
+
+      <!-- Row 5: Toggle Sign, 0, Decimal Point, Equals -->
+      <button data-key="toggle-sign" class="btn-active bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-lg p-4 rounded-2xl hover:brightness-95 transition">+/-</button>
+      <button data-key="num" data-val="0" class="btn-active bg-slate-100 dark:bg-slate-700/50 text-slate-800 dark:text-slate-100 font-semibold text-xl p-4 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition">0</button>
+      <button data-key="decimal" class="btn-active bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xl p-4 rounded-2xl hover:brightness-95 transition">.</button>
+      <button data-key="equals" class="btn-active bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl p-4 rounded-2xl shadow-lg transition" title="Xem kết quả (Enter)">=</button>
+    </div>
+
+    <!-- History Sidebar Panel (Overlay) -->
+    <div id="history-panel" class="absolute inset-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col z-20">
+      <div class="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
+        <h3 class="font-bold text-lg flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Lịch sử tính toán
+        </h3>
+        <button id="btn-close-history" class="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- History Items Container -->
+      <div id="history-list" class="flex-1 overflow-y-auto p-5 space-y-4">
+        <!-- Content will be injected dynamically -->
+      </div>
+
+      <!-- History Actions Footer -->
+      <div class="p-4 border-t border-slate-100 dark:border-slate-800 flex justify-between gap-4">
+        <button id="btn-clear-history" class="flex-1 bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 font-semibold py-2.5 px-4 rounded-xl hover:brightness-95 active:scale-95 transition text-sm">
+          Xóa toàn bộ lịch sử
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Shortcuts Help Information -->
+  <div class="mt-6 text-center text-xs text-slate-400 dark:text-slate-500 max-w-sm">
+    <p class="font-semibold mb-1">💡 Phím tắt bàn phím vật lý:</p>
+    <p>Số <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-500">0-9</code>, Dấu chấm <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-500">.</code>, Phép tính <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-500">+ - * /</code>, Xem kết quả <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-500">Enter / =</code>, Xóa lùi <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-500">Backspace</code>, Xóa sạch <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-500">Esc</code>, Xem lịch sử <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-500">H</code></p>
+  </div>
+
+  <!-- Main Application Logic (Business Logic Engine) -->
+  <script>
+    // State Manager
+    const state = {
+      currentValue: '0',
+      previousValue: null,
+      operation: null,
+      isResetOnNextInput: false,
+      history: JSON.parse(localStorage.getItem('calc_history') || '[]')
+    };
+
+    // DOM Elements Mapping
+    const displayCurrent = document.getElementById('display-current');
+    const displayExpr = document.getElementById('display-expr');
+    const historyPanel = document.getElementById('history-panel');
+    const btnToggleHistory = document.getElementById('btn-toggle-history');
+    const btnCloseHistory = document.getElementById('btn-close-history');
+    const btnClearHistory = document.getElementById('btn-clear-history');
+    const historyList = document.getElementById('history-list');
+    const btnThemeToggle = document.getElementById('btn-theme-toggle');
+    const themeSun = document.getElementById('theme-sun');
+    const themeMoon = document.getElementById('theme-moon');
+
+    // Theme Management Implementation
+    function initTheme() {
+      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        themeSun.classList.remove('hidden');
+        themeMoon.classList.add('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        themeSun.classList.add('hidden');
+        themeMoon.classList.remove('hidden');
+      }
+    }
+
+    btnThemeToggle.addEventListener('click', () => {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        themeSun.classList.add('hidden');
+        themeMoon.classList.remove('hidden');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeSun.classList.remove('hidden');
+        themeMoon.classList.add('hidden');
+      }
+    });
+
+    initTheme();
+
+    // Floating-Point Safe Mathematical Calculator Engine
+    function calculate(a, b, op) {
+      const numA = parseFloat(a);
+      const numB = parseFloat(b);
+      if (isNaN(numA) || isNaN(numB)) return '';
+
+      // Determine precision point of operation safely to avoid JavaScript math errors (e.g., 0.1 + 0.2)
+      const getPrecision = (num) => {
+        const parts = num.toString().split('.');
+        return parts[1] ? parts[1].length : 0;
+      };
+      const precision = Math.max(getPrecision(numA), getPrecision(numB));
+
+      let result;
+      switch (op) {
+        case '+':
+          result = numA + numB;
+          break;
+        case '-':
+          result = numA - numB;
+          break;
+        case '*':
+          result = numA * numB;
+          break;
+        case '/':
+          if (numB === 0) return 'Error: Division by zero';
+          result = numA / numB;
+          break;
+        default:
+          return b;
+      }
+      
+      // Fix Precision Overflow and round to avoid float inaccuracy safely
+      const fixedResult = parseFloat(result.toFixed(Math.max(precision, 12)));
+      return String(fixedResult);
+    }
+
+    // Dynamic Display Renderer
+    function updateDisplay() {
+      // Current Screen Value Output formatting
+      if (state.currentValue === 'Error: Division by zero') {
+        displayCurrent.textContent = state.currentValue;
+        displayCurrent.classList.add('text-red-500', 'text-2xl');
+        displayCurrent.classList.remove('text-4xl', 'text-5xl');
+      } else {
+        displayCurrent.classList.remove('text-red-500', 'text-2xl');
+        displayCurrent.classList.add('text-4xl', 'text-5xl');
+        
+        // Auto-scale font on long numbers
+        if (state.currentValue.length > 12) {
+          displayCurrent.classList.replace('text-5xl', 'text-2xl');
+        } else if (state.currentValue.length > 8) {
+          displayCurrent.classList.replace('text-5xl', 'text-3xl');
+        }
+        
+        // Format display values safely with grouping separators
+        const parts = state.currentValue.split('.');
+        let formatted = parseFloat(parts[0]).toLocaleString('vi-VN');
+        if (isNaN(parseFloat(parts[0]))) formatted = '0';
+        if (parts.length > 1) {
+          formatted += ',' + parts[1];
+        }
+        displayCurrent.textContent = state.currentValue.includes('e') ? state.currentValue : formatted;
+      }
+
+      // Upper Sub-Display formulation builder
+      if (state.operation) {
+        let opSymbol = state.operation;
+        if (opSymbol === '/') opSymbol = '÷';
+        if (opSymbol === '*') opSymbol = '×';
+        displayExpr.textContent = `${parseFloat(state.previousValue).toLocaleString('vi-VN')} ${opSymbol}`;
+      } else {
+        displayExpr.textContent = '';
+      }
+    }
+
+    // Core State Actions Dispatcher
+    function handleNumber(num) {
+      if (state.currentValue === '0' || state.currentValue === 'Error: Division by zero' || state.isResetOnNextInput) {
+        state.currentValue = num;
+        state.isResetOnNextInput = false;
+      } else {
+        // Prevent typing too long numbers
+        if (state.currentValue.replace(/[^0-9]/g, '').length < 15) {
+          state.currentValue += num;
+        }
+      }
+      updateDisplay();
+    }
+
+    function handleDecimal() {
+      if (state.isResetOnNextInput || state.currentValue === 'Error: Division by zero') {
+        state.currentValue = '0.';
+        state.isResetOnNextInput = false;
+        updateDisplay();
+        return;
+      }
+      if (!state.currentValue.includes('.')) {
+        state.currentValue += '.';
+      }
+      updateDisplay();
+    }
+
+    function handleOperator(nextOp) {
+      if (state.currentValue === 'Error: Division by zero') return;
+
+      if (state.operation && !state.isResetOnNextInput) {
+        const result = calculate(state.previousValue, state.currentValue, state.operation);
+        if (result === 'Error: Division by zero') {
+          state.currentValue = result;
+          state.previousValue = null;
+          state.operation = null;
+          updateDisplay();
+          return;
+        }
+        state.previousValue = result;
+        state.currentValue = result;
+      } else {
+        state.previousValue = state.currentValue;
+      }
+
+      state.operation = nextOp;
+      state.isResetOnNextInput = true;
+      updateDisplay();
+    }
+
+    function handleEquals() {
+      if (!state.operation || state.currentValue === 'Error: Division by zero') return;
+
+      const result = calculate(state.previousValue, state.currentValue, state.operation);
+      
+      if (result !== 'Error: Division by zero') {
+        // Push successful operations to storage history records
+        addHistoryItem(`${state.previousValue} ${state.operation} ${state.currentValue}`, result);
+      }
+
+      state.currentValue = result;
+      state.previousValue = null;
+      state.operation = null;
+      state.isResetOnNextInput = true;
+      updateDisplay();
+    }
+
+    function handleClear() {
+      state.currentValue = '0';
+      state.previousValue = null;
+      state.operation = null;
+      state.isResetOnNextInput = false;
+      updateDisplay();
+    }
+
+    function handleBackspace() {
+      if (state.currentValue === 'Error: Division by zero' || state.isResetOnNextInput) {
+        state.currentValue = '0';
+        updateDisplay();
+        return;
+      }
+      if (state.currentValue.length > 1) {
+        state.currentValue = state.currentValue.slice(0, -1);
+      } else {
+        state.currentValue = '0';
+      }
+      updateDisplay();
+    }
+
+    function handlePercent() {
+      if (state.currentValue === 'Error: Division by zero') return;
+      const num = parseFloat(state.currentValue);
+      state.currentValue = String(num / 100);
+      updateDisplay();
+    }
+
+    function handleToggleSign() {
+      if (state.currentValue === '0' || state.currentValue === 'Error: Division by zero') return;
+      if (state.currentValue.startsWith('-')) {
+        state.currentValue = state.currentValue.slice(1);
+      } else {
+        state.currentValue = '-' + state.currentValue;
+      }
+      updateDisplay();
+    }
+
+    // Calculation History Storage & Panel Renderers
+    function addHistoryItem(expr, res) {
+      // Prevent saving invalid numbers
+      if (res === 'Error: Division by zero' || isNaN(parseFloat(res))) return;
+
+      const formattedExpr = expr.replace(/\*/g, '×').replace(/\//g, '÷');
+      const item = {
+        id: Date.now() + Math.random().toString(36).substr(2, 5),
+        expression: formattedExpr,
+        result: res
+      };
+      state.history.unshift(item);
+      
+      // Enforce history count cap limit of 10 items
+      if (state.history.length > 10) {
+        state.history.pop();
+      }
+      localStorage.setItem('calc_history', JSON.stringify(state.history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      historyList.innerHTML = '';
+      if (state.history.length === 0) {
+        historyList.innerHTML = `
+          <div class="flex flex-col items-center justify-center h-48 text-slate-400 dark:text-slate-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-sm">Chưa có lịch sử phép tính nào</p>
+          </div>
+        `;
+        return;
+      }
+
+      state.history.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-150 dark:border-slate-700/50 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 cursor-pointer transition';
+        itemDiv.innerHTML = `
+          <div class="text-xs text-slate-400 dark:text-slate-500 font-mono text-right">${item.expression}</div>
+          <div class="text-lg font-bold font-mono text-right text-indigo-600 dark:text-indigo-400">= ${parseFloat(item.result).toLocaleString('vi-VN')}</div>
+        `;
+        // Restore historic result on mouse click feedback
+        itemDiv.addEventListener('click', () => {
+          state.currentValue = item.result;
+          state.isResetOnNextInput = true;
+          updateDisplay();
+          toggleHistoryPanel(false);
+        });
+        historyList.appendChild(itemDiv);
+      });
+    }
+
+    function toggleHistoryPanel(show) {
+      if (show) {
+        historyPanel.classList.remove('translate-x-full');
+      } else {
+        historyPanel.classList.add('translate-x-full');
+      }
+    }
+
+    // Events Listeners for Screen & Panel Controls
+    btnToggleHistory.addEventListener('click', () => toggleHistoryPanel(true));
+    btnCloseHistory.addEventListener('click', () => toggleHistoryPanel(false));
+    btnClearHistory.addEventListener('click', () => {
+      state.history = [];
+      localStorage.removeItem('calc_history');
+      renderHistory();
+    });
+
+    // Keypad Click Event Bindings
+    document.querySelectorAll('[data-key]').forEach(button => {
+      button.addEventListener('click', () => {
+        const keyType = button.getAttribute('data-key');
+        const val = button.getAttribute('data-val');
+
+        switch (keyType) {
+          case 'num':
+            handleNumber(val);
+            break;
+          case 'decimal':
+            handleDecimal();
+            break;
+          case 'operator':
+            handleOperator(val);
+            break;
+          case 'equals':
+            handleEquals();
+            break;
+          case 'clear':
+            handleClear();
+            break;
+          case 'backspace':
+            handleBackspace();
+            break;
+          case 'percent':
+            handlePercent();
+            break;
+          case 'toggle-sign':
+            handleToggleSign();
+            break;
+        }
+      });
+    });
+
+    // Hardware Keyboard Input Handling
+    window.addEventListener('keydown', (e) => {
+      // Ignore key events if the user is focusing on interactive layout inputs
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+
+      const key = e.key;
+
+      if (/[0-9]/.test(key)) {
+        handleNumber(key);
+      } else if (key === '.') {
+        handleDecimal();
+      } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+        e.preventDefault();
+        handleOperator(key);
+      } else if (key === 'Enter' || key === '=') {
+        e.preventDefault();
+        handleEquals();
+      } else if (key === 'Backspace') {
+        e.preventDefault();
+        handleBackspace();
+      } else if (key === 'Escape') {
+        e.preventDefault();
+        handleClear();
+      } else if (key === '%') {
+        handlePercent();
+      } else if (key.toLowerCase() === 'h') {
+        e.preventDefault();
+        // Toggle History Panel
+        const isClosed = historyPanel.classList.contains('translate-x-full');
+        toggleHistoryPanel(isClosed);
+      }
+    });
+
+    // Initial renders load
+    updateDisplay();
+    renderHistory();
+  </script>
+</body>
+</html>
+```
+
+---
