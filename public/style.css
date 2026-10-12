@@ -1,0 +1,290 @@
+:root {
+    --bg-color: #eef2f3;
+    --calc-bg: #e0e5ec;
+    --shadow-dark: #a3b1c6;
+    --shadow-light: #ffffff;
+    --screen-bg: #2d3130;
+    --screen-text-primary: #a3f307;
+    --screen-text-secondary: #88c005;
+    --text-color: #333333;
+    --btn-operator-bg: #ff9f0a;
+    --btn-operator-text: #ffffff;
+    --btn-function-bg: #b5c4d6;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    user-select: none;
+}
+
+body {
+    background: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Container chính bao gồm máy tính và Lịch sử */
+.calculator-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    max-width: 780px;
+    width: 100%;
+    justify-content: center;
+}
+
+/* Thiết kế phong cách Neumorphism cho máy tính */
+.calculator {
+    background: var(--calc-bg);
+    border-radius: 30px;
+    padding: 30px;
+    width: 360px;
+    box-shadow: 9px 9px 16px var(--shadow-dark), 
+                -9px -9px 16px var(--shadow-light);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Header */
+.calculator-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5px;
+}
+
+.brand {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #7b889b;
+}
+
+.brand span {
+    color: #e07a5f;
+}
+
+.btn-icon {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #495e7b;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+    color: #000;
+}
+
+/* Màn hình hiển thị kiểu LED cổ điển */
+.screen-wrapper {
+    background: var(--screen-bg);
+    border-radius: 15px;
+    padding: 15px 20px;
+    text-align: right;
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.6), 
+                inset -4px -4px 8px rgba(255,255,255,0.05);
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    overflow: hidden;
+    word-break: break-all;
+    border: 4px solid #ccd1d9;
+}
+
+.formula-line {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 16px;
+    color: var(--screen-text-secondary);
+    min-height: 20px;
+    width: 100%;
+    opacity: 0.85;
+    letter-spacing: 1px;
+}
+
+.result-line {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 38px;
+    color: var(--screen-text-primary);
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    letter-spacing: 1.5px;
+    scrollbar-width: none; /* Ẩn scrollbar Firefox */
+}
+
+.result-line::-webkit-scrollbar {
+    display: none; /* Ẩn scrollbar Chrome/Safari */
+}
+
+/* Layout phím bấm */
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+/* Thiết kế Nút Neumorphism */
+.btn {
+    border: none;
+    outline: none;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-color);
+    background: var(--calc-bg);
+    box-shadow: 4px 4px 8px var(--shadow-dark), 
+                -4px -4px 8px var(--shadow-light);
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn:active, .btn.keyboard-active {
+    box-shadow: inset 2px 2px 5px var(--shadow-dark), 
+                inset -2px -2px 5px var(--shadow-light);
+    transform: scale(0.97);
+}
+
+/* Màu sắc nút đặc thù */
+.fn-btn {
+    background: var(--btn-function-bg);
+    font-size: 17px;
+    color: #2b3a4a;
+}
+
+.op-btn {
+    background: var(--btn-operator-bg);
+    color: var(--btn-operator-text);
+}
+
+.op-btn:active {
+    background: #e08b00;
+}
+
+.equal-btn {
+    background: #2ec4b6;
+    color: white;
+    border-radius: 30px;
+    font-size: 24px;
+}
+
+.equal-btn:active {
+    background: #25a195;
+}
+
+/* Sidebar hiển thị Lịch sử */
+.history-sidebar {
+    width: 280px;
+    background: var(--calc-bg);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 9px 9px 16px var(--shadow-dark), 
+                -9px -9px 16px var(--shadow-light);
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.history-sidebar.collapsed {
+    display: none;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ccd1d9;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.history-header h3 {
+    font-size: 15px;
+    color: #495e7b;
+}
+
+#clearHistoryBtn {
+    background: transparent;
+    border: none;
+    color: #e07a5f;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.history-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.empty-history {
+    color: #8c9ba5;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 50px;
+    font-style: italic;
+}
+
+.history-item {
+    background: rgba(255, 255, 255, 0.4);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    text-align: right;
+    cursor: pointer;
+    border-left: 3px solid #2ec4b6;
+    transition: background 0.2s ease;
+}
+
+.history-item:hover {
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.history-item-formula {
+    color: #727272;
+    margin-bottom: 3px;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-item-result {
+    font-weight: bold;
+    color: #1c2a38;
+}
+
+/* Tương thích Responsive cho thiết bị di động */
+@media (max-width: 680px) {
+    .calculator-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .history-sidebar {
+        width: 360px;
+        height: 220px;
+    }
+}
+```
+
+---
