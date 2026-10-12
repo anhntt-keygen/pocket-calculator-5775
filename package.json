@@ -1,0 +1,28 @@
+{
+  "name": "pocket-calculator",
+  "version": "1.0.0",
+  "description": "Ứng dụng Máy tính cầm tay bỏ túi chuyên nghiệp và hiện đại",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "npx playwright test"
+  },
+  "keywords": [
+    "calculator",
+    "pocket",
+    "neumorphism",
+    "math",
+    "javascript"
+  ],
+  "author": "Vibecode Senior Full-Stack Developer",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.1"
+  }
+}
+```
+
+---
