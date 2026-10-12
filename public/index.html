@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pocket Calculator - Máy Tính Bỏ Túi Cao Cấp</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="calculator-container">
+        <!-- Khu vực hiển thị Lịch sử ở góc bên cạnh (Có thể ẩn/hiện) -->
+        <div class="history-sidebar" id="historySidebar">
+            <div class="history-header">
+                <h3>Lịch sử tính toán</h3>
+                <button id="clearHistoryBtn" title="Xóa toàn bộ lịch sử">Xóa sạch</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="empty-history">Chưa có dữ liệu tính toán</div>
+            </div>
+        </div>
+
+        <!-- Máy tính chính -->
+        <div class="calculator">
+            <!-- Header máy tính -->
+            <div class="calculator-header">
+                <span class="brand">VIBECODE <span>ELECTRONICS</span></span>
+                <button id="toggleHistoryBtn" class="btn-icon" title="Xem lịch sử">
+                    🕒 Lịch sử
+                </button>
+            </div>
+
+            <!-- Màn hình hiển thị LED -->
+            <div class="screen-wrapper">
+                <div class="formula-line" id="formulaDisplay"></div>
+                <div class="result-line" id="resultDisplay">0</div>
+            </div>
+
+            <!-- Bàn phím nút bấm -->
+            <div class="keypad">
+                <!-- Hàng 1 -->
+                <button class="btn fn-btn" data-action="all-clear">AC</button>
+                <button class="btn fn-btn" data-action="delete">DEL</button>
+                <button class="btn fn-btn" data-action="percent">%</button>
+                <button class="btn op-btn" data-action="operator" data-val="/">÷</button>
+
+                <!-- Hàng 2 -->
+                <button class="btn num-btn" data-val="7">7</button>
+                <button class="btn num-btn" data-val="8">8</button>
+                <button class="btn num-btn" data-val="9">9</button>
+                <button class="btn op-btn" data-action="operator" data-val="*">×</button>
+
+                <!-- Hàng 3 -->
+                <button class="btn num-btn" data-val="4">4</button>
+                <button class="btn num-btn" data-val="5">5</button>
+                <button class="btn num-btn" data-val="6">6</button>
+                <button class="btn op-btn" data-action="operator" data-val="-">-</button>
+
+                <!-- Hàng 4 -->
+                <button class="btn num-btn" data-val="1">1</button>
+                <button class="btn num-btn" data-val="2">2</button>
+                <button class="btn num-btn" data-val="3">3</button>
+                <button class="btn op-btn" data-action="operator" data-val="+">+</button>
+
+                <!-- Hàng 5 -->
+                <button class="btn num-btn" data-action="negate">+/-</button>
+                <button class="btn num-btn" data-val="0">0</button>
+                <button class="btn num-btn" data-val=".">.</button>
+                <button class="btn equal-btn" id="equalsBtn">=</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script điều khiển -->
+    <script src="app.js"></script>
+</body>
+</html>
+```
+
+---
